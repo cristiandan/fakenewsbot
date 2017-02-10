@@ -17,7 +17,7 @@ module.exports.handleRequest = (event, context, callback) => {
   console.log('query', event.queryStringParameters);
 
   if (event.queryStringParameters['hub.mode'] === 'subscribe' &&
-    event.queryStringParameters['hub.verify_token'] === "") {
+    event.queryStringParameters['hub.verify_token'] === process.env.VERIFY_TOKEN) {
     console.log("Validating webhook");
     done(null, event.queryStringParameters['hub.challenge']);
   } else {
@@ -115,9 +115,10 @@ function sendTextMessage(recipientId, messageText) {
 }
 
 function callSendAPI(messageData) {
+  console.log("envi",process.env.PAGE_ACCESS_TOKEN);
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: { access_token: '' },
+    qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
     method: 'POST',
     json: messageData
 

@@ -36,4 +36,12 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
+# Sensitive data, tokens, etc
+sensitive.yml
+
+# Serverless compiled artifacts
+aws-nodejs.zip
+.serverless/
+
+# Other
 .DS_STORE
