@@ -1,6 +1,9 @@
 'use strict';
 
 const request = require('request');
+const mongoose = require('mongoose');
+const User = require('./userModel');
+mongoose.connect(process.env.MONGO_DB_CONNECTION);
 
 module.exports.handleMessage = (event, context, callback) => {
 
@@ -40,6 +43,14 @@ module.exports.handleMessage = (event, context, callback) => {
         var recipientID = event.recipient.id;
         var timeOfMessage = event.timestamp;
         var message = event.message;
+
+        const user = new User({id: senderID});
+        user.save(function(err){
+            if (err) {
+                console.log({info: 'error during cat create', error: err});
+            };
+            console.log({info: 'cat created successfully'});
+        });
 
         console.log("Received message for user %d and page %d at %d with message:",
             senderID, recipientID, timeOfMessage);
@@ -81,7 +92,6 @@ module.exports.handleMessage = (event, context, callback) => {
     }
 
     function callSendAPI(messageData) {
-        console.log("envi", process.env.PAGE_ACCESS_TOKEN);
         request({
             uri: 'https://graph.facebook.com/v2.6/me/messages',
             qs: {

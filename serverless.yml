@@ -1,25 +1,33 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
+service: aws-nodejs
 
-service: aws-nodejs # NOTE: update this with your service name
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  request:
+    handler: src/callbackValidator.handleRequest
+    environment:
+      VERIFY_TOKEN: ${file(./sensitive.yml):verifyToken}
+
+    events:
+      - http:
+          path: message
+          method: get
+  newMessage:
+    handler: src/messageHandler.handleMessage
+    environment:
+      PAGE_ACCESS_TOKEN: ${file(./sensitive.yml):pageAcessToken}
+      MONGO_DB_CONNECTION: ${file(./sensitive.yml):mongodbConnection}
+    events:
+      - http:
+          path: message
+          method: post
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
-provider:
-  name: aws
-  runtime: nodejs4.3
 
 # you can overwrite defaults here
 #  stage: dev
@@ -53,26 +61,10 @@ provider:
 #    - exclude-me.js
 #    - exclude-me-dir/**
 
-functions:
-  request:
-    handler: callbackValidator.handleRequest
-    environment:
-      VERIFY_TOKEN: ${file(./sensitive.yml):verifyToken}
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-    events:
-      - http:
-          path: message
-          method: get
-  newMessage:
-    handler: messageHandler.handleMessage
-    environment:
-      PAGE_ACCESS_TOKEN: ${file(./sensitive.yml):pageAcessToken}
-    events:
-      - http:
-          path: message
-          method: post
+
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
