@@ -113,8 +113,10 @@ module.exports.handleMessage = (event, context, callback) => {
                 console.error(response);
                 console.error(error);
             }
-            done(null, "ok");
+            
         });
     }
-
+    
+    mongoose.connection.close();
+    done(null, "ok");
 }
