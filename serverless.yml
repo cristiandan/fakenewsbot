@@ -1,5 +1,8 @@
 service: vote-reminder
 
+plugins:
+  - serverless-offline
+
 provider:
   name: aws
   runtime: nodejs4.3
