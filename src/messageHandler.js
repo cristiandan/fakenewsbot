@@ -2,7 +2,7 @@
 
 const request = require('request');
 const mongoose = require('mongoose');
-const User = require('./userModel');
+const userDataLayer = require('./userDataLayer');
 mongoose.connect(process.env.MONGO_DB_CONNECTION);
 
 module.exports.handleMessage = (event, context, callback) => {
@@ -48,7 +48,7 @@ function receivedMessage(event) {
 
     getUserInfo(senderId, function(userInfo){
         console.log('UserInfo', userInfo);
-        saveUserData(senderId, recipientId, userInfo);
+        userDataLayer.saveUniqueUserData(senderId, recipientId, userInfo);
     });
 
     var messageId = message.mid;
@@ -78,15 +78,6 @@ function handleTextMessage(message, senderId, recipientId, timeOfMessage) {
             default:
                 sendTextMessage(senderId, messageText);
         }
-}
-
-function saveUserData(userId, pageMessaged, userData) {
-    Object.assign(userData, { userId: userId, pageMessaged: pageMessaged });
-    const user = new User(userData);
-    user.save(function (err) {
-        if (err) {};
-    
-    });
 }
 
 function getUserInfo(userId, callback) {
