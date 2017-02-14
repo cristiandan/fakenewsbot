@@ -33,7 +33,6 @@ module.exports.handleMessage = (event, context, callback) => {
         });
     }
 
-    mongoose.connection.close();
     done(null, "ok");
 }
 

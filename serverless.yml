@@ -22,7 +22,6 @@ functions:
     handler: src/messageHandler.handleMessage
     environment:
       PAGE_ACCESS_TOKEN: ${file(./sensitive.yml):pageAcessToken}
-      MONGO_DB_CONNECTION: ${file(./sensitive.yml):mongodbConnection}
     events:
       - http:
           path: message
