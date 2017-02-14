@@ -12,9 +12,8 @@ function saveUserData(userData) {
         TableName: 'userTable',
         Item: userData
     };
-    database.put(params).promise()
-        .then(value => console.log(value))
-        .catch(error => console.log(error));
+
+    return database.put(params).promise();
 }
 
 function getUserByUId(userId) {
@@ -25,19 +24,27 @@ function getUserByUId(userId) {
         }
     };
 
-    database.get(params).promise()
-        .then(value => console.log("getById",value))
-        .catch(error => console.log("getByIderror",error));
+    return database.get(params).promise();
 }
 
 module.exports = {
     saveUniqueUserData: function (userId, pageMessaged, userData) {
-        // getUserByUId(userId);
-        Object.assign(userData, {
-            userId: userId,
-            pageMessaged: pageMessaged
-        });
-        saveUserData(userData);
+        getUserByUId(userId)
+            .then(function(value){
+                if (!Object.keys(value).length)
+                {
+                    Object.assign(userData, {
+                        userId: userId,
+                        pageMessaged: pageMessaged
+                    });
+                    saveUserData(userData)
+                        .then(function(value){
+
+                        })
+                        .catch(handleError);
+                }
+            })
+            .catch(handleError);
     },
     getUserByUId: getUserByUId
 }
