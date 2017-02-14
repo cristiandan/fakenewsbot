@@ -1,9 +1,7 @@
 'use strict';
 
 const request = require('request');
-const mongoose = require('mongoose');
 const userDataLayer = require('./userDataLayer');
-mongoose.connect(process.env.MONGO_DB_CONNECTION);
 
 module.exports.handleMessage = (event, context, callback) => {
 
