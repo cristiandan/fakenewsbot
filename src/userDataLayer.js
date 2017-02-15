@@ -29,22 +29,17 @@ function getUserByUId(userId) {
 
 module.exports = {
     saveUniqueUserData: function (userId, pageMessaged, userData) {
-        getUserByUId(userId)
-            .then(function(value){
-                if (!Object.keys(value).length)
-                {
-                    Object.assign(userData, {
-                        userId: userId,
-                        pageMessaged: pageMessaged
-                    });
-                    saveUserData(userData)
-                        .then(function(value){
 
-                        })
-                        .catch(handleError);
-                }
+        Object.assign(userData, {
+            userId: userId,
+            pageMessaged: pageMessaged
+        });
+        saveUserData(userData)
+            .then(function (value) {
+
             })
             .catch(handleError);
+
     },
     getUserByUId: getUserByUId
 }

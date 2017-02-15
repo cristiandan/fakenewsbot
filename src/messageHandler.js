@@ -43,10 +43,18 @@ function receivedMessage(event) {
     var timeOfMessage = event.timestamp;
     var message = event.message;
 
-    getUserInfo(senderId, function(userInfo){
-        console.log('UserInfo', userInfo);
-        userDataLayer.saveUniqueUserData(senderId, recipientId, userInfo);
-    });
+    userDataLayer.getUserByUId(senderId)
+            .then(function(user){
+                console.log('get user by id', user)
+                if (!Object.keys(user).length)
+                {
+                    getUserInfo(senderId, function(userInfo){
+                        console.log('UserInfo', userInfo);
+                        userDataLayer.saveUniqueUserData(senderId, recipientId, userInfo);
+                    });
+                }
+            })
+            .catch(handleError);
 
     var messageId = message.mid;
     var messageText = message.text;
@@ -55,11 +63,11 @@ function receivedMessage(event) {
     if (messageText) {
         handleTextMessage(message, senderId, recipientId, timeOfMessage);
     } else if (messageAttachments) {
-        handleMsgWithAttachament(message);
+        handleMsgWithAttachament(message, senderId);
     }
 }
 
-function handleMsgWithAttachament(message) {
+function handleMsgWithAttachament(message, senderId) {
     sendTextMessage(senderId, "Message with attachment received");    
 }
 
@@ -134,4 +142,8 @@ function callSendAPI(messageData) {
         }
 
     });
+}
+
+function handleError(err) {
+    console.error("error!", err);
 }
