@@ -1,5 +1,3 @@
-console.log('test1');
-
 const request = require('request');
 const userDataLayer = require('./userDataLayer');
 const getUrls = require('get-urls');
@@ -106,12 +104,14 @@ function handleTextMessage(message, senderId, recipientId, timeOfMessage) {
     //     }
     const urlList = parseTextForUrls(messageText);
 
-    newsDataLayer.findHostnames(urlList, function(site){
-        if(site && site.Item){
-            message = makeMessageText(site.Item);
-            sendTextMessage(senderId, message);
-        }
-        //console.log('site', site);
+    newsDataLayer.findHostnames(Array.from(urlList))
+        .then(function(sitesData){
+            sitesData.forEach(function(site){
+                if(site && site.Item){
+                    message = makeMessageText(site.Item);
+                    sendTextMessage(senderId, message);
+                }
+            })
     });
 }
 
@@ -162,9 +162,8 @@ function getUserInfo(userId, callback) {
         if (!error && response.statusCode == 200) {
             callback(JSON.parse(body));
         } else {
-            console.error("Unable to send message.");
-            console.error("response", response);
-            console.error("error", error);
+            error.response = response;
+            handleError(error)
         }
     });
 }
@@ -200,9 +199,8 @@ function callSendAPI(messageData) {
                 messageId, recipientId);
 
         } else {
-            console.error("Unable to send message.");
-            console.error(response);
-            console.error(error);
+            error.response = response;
+            handleError(error);
         }
 
     });

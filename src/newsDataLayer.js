@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const database = new AWS.DynamoDB.DocumentClient();
 const url = require('url');
+const q = require('q');
 
 function findSiteByName (hostname) {
         var params = {
@@ -14,11 +15,12 @@ function findSiteByName (hostname) {
     }
 
 module.exports = {
-    findHostnames: function (urlList, callback) {
-        urlList.forEach(function(urlText, index){
-            const urlObject = url.parse(urlText);
-            findSiteByName(urlObject.hostname).then(callback);
+    findHostnames: function (urlList) {
+        var promises = urlList.map(function(urlString){
+            var urlObject = url.parse(urlString);
+            return findSiteByName(urlObject.hostname);
         })
+        return q.all(promises);
     },
     findSiteByName: findSiteByName,
 }
