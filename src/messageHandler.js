@@ -1,7 +1,9 @@
-'use strict';
+console.log('test1');
 
 const request = require('request');
 const userDataLayer = require('./userDataLayer');
+const getUrls = require('get-urls');
+const newsDataLayer = require('./newsDataLayer');
 
 module.exports.handleMessage = (event, context, callback) => {
 
@@ -23,17 +25,36 @@ module.exports.handleMessage = (event, context, callback) => {
             var pageID = entry.id;
             var timeOfEvent = entry.time;
 
-            entry.messaging.forEach(function (event) {
-                if (event.message) {
-                    receivedMessage(event);
-                } else {
-                    console.log("Webhook received unknown event: ", event);
-                }
-            });
+            handleMessagingEvents(entry);
         });
     }
 
     done(null, "ok");
+}
+
+function handleMessagingEvents (entry) {
+    entry.messaging.forEach(function(messagingEvent) {
+        if (messagingEvent.message) {
+          receivedMessage(messagingEvent);
+        } else if (messagingEvent.optin) {
+          // receivedAuthentication(messagingEvent);
+          console.log("received authentication event", messagingEvent);
+        } else if (messagingEvent.delivery) {
+          // receivedDeliveryConfirmation(messagingEvent);
+          console.log("received delivery confirmation event", messagingEvent);
+        } else if (messagingEvent.postback) {
+          // receivedPostback(messagingEvent);
+          console.log("received postback event", messagingEvent);
+        } else if (messagingEvent.read) {
+          // receivedMessageRead(messagingEvent);
+          console.log("received message read event", messagingEvent);
+        } else if (messagingEvent.account_linking) {
+          // receivedAccountLink(messagingEvent);
+          console.log("received account link event", messagingEvent);
+        } else {
+          console.log("Webhook received unknown messagingEvent: ", messagingEvent);
+        }
+    });
 }
 
 
@@ -75,14 +96,57 @@ function handleTextMessage(message, senderId, recipientId, timeOfMessage) {
 
     var messageText = message.text;
 
-    switch (messageText) {
-            case 'generic':
-                sendTextMessage(senderId, "messageText12");
-                break;
+    // switch (messageText) {
+    //         case 'generic':
+    //             sendTextMessage(senderId, "messageText12");
+    //             break;
 
-            default:
-                sendTextMessage(senderId, messageText);
+    //         default:
+    //             sendTextMessage(senderId, messageText);
+    //     }
+    const urlList = parseTextForUrls(messageText);
+
+    newsDataLayer.findHostnames(urlList, function(site){
+        if(site && site.Item){
+            message = makeMessageText(site.Item);
+            sendTextMessage(senderId, message);
         }
+        //console.log('site', site);
+    });
+}
+
+function makeMessageText(siteData){
+    var emoji = "";
+    switch(siteData.type) {
+        case "danger":
+        emoji = "\u26d4\ufe0f";
+        break;
+
+        case "warning":
+        emoji = "\u26a0\ufe0f";
+        break;
+
+        case "verified":
+        emoji = "\u2705";
+        break;
+
+        case "unknown":
+        emoji = "\u2049\ufe0f";
+        break;
+
+        case "!!":
+        emoji = "\u203c\ufe0f";
+        break;
+
+        default:
+        emoji = "";
+        break;
+    }
+    return emoji + "  " + siteData.name + "\n" + siteData.desc;
+}
+
+function parseTextForUrls(messageText, callback){
+    return getUrls(messageText);
 }
 
 function getUserInfo(userId, callback) {

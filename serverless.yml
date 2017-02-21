@@ -42,6 +42,19 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    DynamoDbTable2:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: siteTable
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
     DynamoDBIamPolicy:
       Type: AWS::IAM::Policy
       DependsOn: DynamoDbTable
@@ -54,7 +67,9 @@ resources:
               Action:
                 - dynamodb:GetItem
                 - dynamodb:PutItem
-              Resource: arn:aws:dynamodb:*:*:table/userTable
+              Resource: 
+                - arn:aws:dynamodb:*:*:table/userTable
+                - arn:aws:dynamodb:*:*:table/siteTable
         Roles:
           - Ref: IamRoleLambdaExecution
 
