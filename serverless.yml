@@ -7,13 +7,13 @@ provider:
   name: aws
   runtime: nodejs4.3
   stage: dev
+  memorySize: 256
 
 functions:
   request:
     handler: src/callbackValidator.handleRequest
     environment:
       VERIFY_TOKEN: ${file(./sensitive.yml):verifyToken}
-
     events:
       - http:
           path: message
@@ -25,6 +25,14 @@ functions:
     events:
       - http:
           path: message
+          method: post
+  addSite:
+    handler: src/addSiteHandler.handleAdd
+    environment:
+      VERIFY_TOKEN: ${file(./sensitive.yml):verifyToken}
+    events:
+      - http:
+          path: addsite
           method: post
 
 resources:  

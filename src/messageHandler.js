@@ -169,16 +169,24 @@ function getUserInfo(userId, callback) {
 }
 
 function sendTextMessage(recipientId, messageText) {
+    var message = limitChars(messageText);
     var messageData = {
         recipient: {
             id: recipientId
         },
         message: {
-            text: messageText
+            text: message
         }
     };
 
     callSendAPI(messageData);
+}
+
+function limitChars(message) {
+    if (message.length > 640) {
+        return message.substring(0, 640);
+    }
+    return message;
 }
 
 function callSendAPI(messageData) {
@@ -198,7 +206,10 @@ function callSendAPI(messageData) {
             console.log("Successfully sent generic message with id %s to recipient %s",
                 messageId, recipientId);
 
-        } else {
+        } else if (response.statusCode != 200){
+            handleError({response: response});
+        }
+        else {
             error.response = response;
             handleError(error);
         }
