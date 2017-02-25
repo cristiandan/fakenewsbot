@@ -18,7 +18,13 @@ module.exports = {
     findHostnames: function (urlList) {
         var promises = urlList.map(function (urlString) {
             var urlObject = url.parse(urlString);
-            return findSiteByName(urlObject.hostname);
+            return findSiteByName(urlObject.hostname).then(function(data){
+                if(Object.keys(data).length) {
+                    return data;
+                } else {
+                    return null;
+                }
+            });
         })
         return q.all(promises);
     },

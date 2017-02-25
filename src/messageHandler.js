@@ -80,39 +80,63 @@ function receivedMessage(event) {
     var messageAttachments = message.attachments;
 
     if (messageText) {
-        handleTextMessage(message, senderId, recipientId, timeOfMessage);
+        handleTextMessage(messageText, senderId);
+    } else if (messageAttachments && messageAttachments.length && messageAttachments[0].type === "fallback" && messageAttachments[0].url){
+        handleAttachamentLink(messageAttachments[0].url, senderId)
     } else if (messageAttachments) {
         handleMsgWithAttachament(message, senderId);
     }
 }
 
-function handleMsgWithAttachament(message, senderId) {
-    sendTextMessage(senderId, "Message with attachment received");    
+function handleAttachamentLink(link, senderId) {
+    handleTextMessage(link, senderId);
 }
 
-function handleTextMessage(message, senderId, recipientId, timeOfMessage) {
+function handleMsgWithAttachament(message, senderId) {
+    sendTextMessage(senderId, "Sorry, this message type is not supported.");    
+}
 
-    var messageText = message.text;
+function handleTextMessage(messageText, senderId) {
 
-    // switch (messageText) {
-    //         case 'generic':
-    //             sendTextMessage(senderId, "messageText12");
-    //             break;
-
-    //         default:
-    //             sendTextMessage(senderId, messageText);
-    //     }
     const urlList = parseTextForUrls(messageText);
 
-    newsDataLayer.findHostnames(Array.from(urlList))
-        .then(function(sitesData){
-            sitesData.forEach(function(site){
-                if(site && site.Item){
-                    message = makeMessageText(site.Item);
-                    sendTextMessage(senderId, message);
+    if(urlList.size) {
+        newsDataLayer.findHostnames(Array.from(urlList))
+            .then(function(sitesData){
+                console.log("sites", sitesData)
+                if (arrayIsOnlyNull(sitesData)){
+                    sendTextMessage(senderId, "Nu am reusit sa gasit date despre acest(e) site(uri), ne pare rau :( .");
                 }
-            })
+                sitesData.forEach(function(site){
+                    if(site && site.Item){
+                        var message = makeMessageText(site.Item);
+                        sendTextMessage(senderId, message);
+                    }
+                })
+        });
+    } else {
+        sendStandardMessageNoLink(senderId);
+    }
+}
+
+function arrayIsOnlyNull(array) {
+    var onlyNull = true;
+    array.forEach(function(item){
+        if(item)
+            onlyNull = false
     });
+
+    return onlyNull;
+}
+
+function sendStandardMessageNoLink(senderId) {
+    var message = "Va rugam sa ne trimiteti un link la un articol, sau un site de stiri, pentru a va putea spune despre el."
+    sendTextMessage(senderId, message);
+}
+
+function sendStandardMessageNoInfo(senderId) {
+    var message = ""
+    sendTextMessage(senderId, message);
 }
 
 function makeMessageText(siteData){

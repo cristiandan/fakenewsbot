@@ -10,13 +10,9 @@ module.exports.handleAdd = (event, context, callback) => {
         },
     });
 
-    const addSuccess = (result) => {
-        console.log('addSuccess', result);
-        done(null, {
+    const addSuccess = () => done(null, {
             message: "Successfully added!",
-            result: result,
         });
-    }
 
     const eventBody = JSON.parse(event.body);
     console.log("body", eventBody);
