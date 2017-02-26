@@ -34,15 +34,15 @@ function handleMessagingEvents (entry) {
     entry.messaging.forEach(function(messagingEvent) {
         if (messagingEvent.message) {
           receivedMessage(messagingEvent);
+        } else if (messagingEvent.postback) {
+          receivedPostback(messagingEvent);
+          console.log("received postback event", messagingEvent);
         } else if (messagingEvent.optin) {
           // receivedAuthentication(messagingEvent);
           console.log("received authentication event", messagingEvent);
         } else if (messagingEvent.delivery) {
           // receivedDeliveryConfirmation(messagingEvent);
           console.log("received delivery confirmation event", messagingEvent);
-        } else if (messagingEvent.postback) {
-          // receivedPostback(messagingEvent);
-          console.log("received postback event", messagingEvent);
         } else if (messagingEvent.read) {
           // receivedMessageRead(messagingEvent);
           console.log("received message read event", messagingEvent);
@@ -53,6 +53,20 @@ function handleMessagingEvents (entry) {
           console.log("Webhook received unknown messagingEvent: ", messagingEvent);
         }
     });
+}
+
+function receivedPostback(event) {
+    var senderId = event.sender.id;
+
+    switch(event.postback.payload) {
+        case "HELP_PAYLOAD":
+        var message = "Va rugam sa ne trimiteti un link la un articol, sau un site de stiri, pentru a va putea spune despre el."
+        sendTextMessage(senderId, message);
+        break;
+        case "SUPPORT_PAYLOAD":
+        var message = "Va rugam sa trimiteti link-ul catre acest bot si altor oameni, si sa ne scrieti pe adresa ..... in caz ca vreti sa ne ajutati la recenziile site-urilor/articolelor."
+        sendTextMessage(senderId, message);
+    }
 }
 
 
