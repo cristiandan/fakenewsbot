@@ -1,5 +1,5 @@
-# Vote Reminder
-A facebook messenger bot that reminds you to vote in Romania, and what happened when people didn't vote.
+# Fake news bot
+A facebook messenger bot that helps people find out if a site is known for fake news and if an article is fake.
 
 ## Get Started
 
@@ -8,7 +8,7 @@ A facebook messenger bot that reminds you to vote in Romania, and what happened 
 - Install Serverless framework. `npm install -g serverless`
 
 ### Clone the repo 
-`git clone https://github.com/cristiandan/votereminder.git`
+`git clone https://github.com/cristiandan/fakenewsbot.git`
 
 ### Configure project
 Create a *sensitive.yml* file with the following:
